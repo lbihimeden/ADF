@@ -1,0 +1,220 @@
+trigger: none
+#  branches:
+#    include:
+#      - adf_publish
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+- name: sourceDataFactoryName
+  type: string
+  displayName: "Nom du 'Data Factory' qui a fait la publication."
+  default: "ADF-tqbi-dev"
+- name: sourceDataFactoryResourceGroup
+  type: string
+  displayName: "Nom du 'Resource Group' dans lequel se trouve le 'Data Factory' qui a fait la publication."
+  default: "RG-bi-dev-adf"
+- name: artifactName
+  type: string
+  displayName: "Nom de l'artéfact qui sera produit."
+  default: "adf-publish-artefact"
+- name: target_env
+  displayName: Environnement de cible
+  type: string
+  default: accp
+  values:
+  - accp
+  - prod
+
+variables:
+  - name: source_subscription_id
+    value: "8fddc10e-b0b2-49b8-8e10-9ec40601dd6c"
+  - name: source_resource_group
+    value: ${{ parameters.sourceDataFactoryResourceGroup }}
+  - name: source_adf_name
+    value: ${{ parameters.sourceDataFactoryName }}
+  - name: target_resource_group
+    value: ${{ format('RG-bi-{0}-adf', parameters.target_env ) }}
+  - name: target_adf_name
+    value: ${{ format('ADF-tqbi-{0}', parameters.target_env ) }}
+  - ${{ if eq('prod', parameters.target_env ) }}:
+    - name: target_sqlmi
+      value: sqlmi-bi-prod-mssql.834d88611202.database.windows.net
+  - ${{ elseif eq('accp', parameters.target_env ) }}:
+    - name: target_sqlmi
+      value: sqlmi-bi-accp-mssql.ae31ea079639.database.windows.net
+  - ${{ else }}:
+    - name: target_sqlmi
+      value: sqlmi-bi-dev-mssql.76e3ddcb6d77.database.windows.net
+
+
+
+jobs:
+  - deployment:
+    environment: bi-${{ parameters.target_env }}
+    displayName: Déploiement vers bi-${{ parameters.target_env }}
+    workspace:
+      clean: all
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: git://TQ.BI/TQ.BI.ADF@refs/heads/master
+            path: master
+          - checkout: git://TQ.BI/TQ.BI.ADF@refs/heads/adf_publish
+            path: adf_publish
+          - checkout: git://TQ.BI/TQ.BI.ADF@refs/heads/collaboration
+            path: collaboration
+ 
+          - task: AzureCLI@2
+            displayName: "Change values by environment"
+            env: 
+              TARGET_ENV: ${{ parameters.target_env }}
+              SOURCE_DATA_FACTORY_NAME: ${{ parameters.sourceDataFactoryName }}
+            inputs:
+              azureSubscription: 'ID-devops-terraform-bi-${{ parameters.target_env }}'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                pwd
+                du -ah
+                export TARGET_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
+                cd ../adf_publish/${SOURCE_ADF_NAME}
+                for f in *.json
+                do
+                  echo "Modification de $f ..."
+                  sed -e '
+                    s/'${SOURCE_SUBSCRIPTION_ID}'/'${TARGET_SUBSCRIPTION_ID}'/g;
+                    s/'${SOURCE_RESOURCE_GROUP}'/'${TARGET_RESOURCE_GROUP}'/g;
+                    s/'${SOURCE_ADF_NAME}'/'${TARGET_ADF_NAME}'/g; 
+                    s/sqlmi-bi-dev-mssql\.76e3ddcb6d77\.database\.windows\.net/'${TARGET_SQLMI}'/g;
+                    s/bi-dev/bi-'${TARGET_ENV}'/g; s/bidev/bi'${TARGET_ENV}'/g; s/bi_dev/bi_'${TARGET_ENV}'/g;
+                  ' "$f" | tee "$(Build.ArtifactStagingDirectory)/$f"
+                done
+                ### Retirer les IR
+                mv "$(Build.ArtifactStagingDirectory)/ARMTemplateForFactory.json" "$(Build.ArtifactStagingDirectory)/ARMTemplateForFactory.json.original"
+                awk '
+                BEGIN { skipIt = 0; } 
+                /\t{3}"name": "\[concat\(parameters\('\''factoryName'\''\), '\''\/BI-integrationRuntime1-Corpo'\''\)\]",/ { 
+                  skipIt = 1;
+                  print $0;
+                  printf("\"type\":\"Microsoft.DataFactory/factories/integrationRuntimes\",\"apiVersion\":\"2018-06-01\",\"properties\":{\"type\":\"SelfHosted\",\"typeProperties\":{\"linkedInfo\":{\"resourceId\":\"/subscriptions/8fddc10e-b0b2-49b8-8e10-9ec40601dd6c/resourcegroups/RG-bi-dev-bi/providers/Microsoft.DataFactory/factories/adf-bi-dev-cnc-001/integrationruntimes/");
+                  printf("BI-integrationRuntime1-Corpo");
+                  printf("\",\"authorizationType\":\"Rbac\",\"credential\":{\"referenceName\":\"Managed-Identity\",\"type\":\"CredentialReference\"}}}},\"dependsOn\":[]\n},{");
+                  next;
+                }         
+                /\t{3}"name": "\[concat\(parameters\('\''factoryName'\''\), '\''\/BI-integrationRuntime1-DMZ'\''\)\]",/ { 
+                  skipIt = 1; 
+                  print $0;
+                  printf("\"type\":\"Microsoft.DataFactory/factories/integrationRuntimes\",\"apiVersion\":\"2018-06-01\",\"properties\":{\"type\":\"SelfHosted\",\"typeProperties\":{\"linkedInfo\":{\"resourceId\":\"/subscriptions/8fddc10e-b0b2-49b8-8e10-9ec40601dd6c/resourcegroups/RG-bi-dev-bi/providers/Microsoft.DataFactory/factories/adf-bi-dev-cnc-001/integrationruntimes/");
+                  printf("BI-integrationRuntime1-DMZ");
+                  printf("\",\"authorizationType\":\"Rbac\",\"credential\":{\"referenceName\":\"Managed-Identity\",\"type\":\"CredentialReference\"}}}},\"dependsOn\":[]\n},{");
+                  next;
+                }         
+                /\t{3}"name": "\[concat\(parameters\('\''factoryName'\''\), '\''\/SHIR-DEV-CNC-001'\''\)\]",/ { 
+                  skipIt = 1; 
+                  print $0;
+                  printf("\"type\":\"Microsoft.DataFactory/factories/integrationRuntimes\",\"apiVersion\":\"2018-06-01\",\"properties\":{\"type\":\"SelfHosted\",\"typeProperties\":{\"linkedInfo\":{\"resourceId\":\"/subscriptions/8fddc10e-b0b2-49b8-8e10-9ec40601dd6c/resourcegroups/RG-bi-dev-bi/providers/Microsoft.DataFactory/factories/adf-bi-dev-cnc-001/integrationruntimes/");
+                  printf("SHIR-DEV-CNC-001");
+                  printf("\",\"authorizationType\":\"Rbac\",\"credential\":{\"referenceName\":\"Managed-Identity\",\"type\":\"CredentialReference\"}}}},\"dependsOn\":[]\n},{");
+                  next; 
+                } 
+                /\t{3}"name": / { 
+                  skipIt = 0;
+                }
+                { 
+                  if( skipIt ) { 
+                    next; 
+                  } else {
+                    print $0;
+                  }
+                }
+                '  "$(Build.ArtifactStagingDirectory)/ARMTemplateForFactory.json.original" > "$(Build.ArtifactStagingDirectory)/ARMTemplateForFactory.json"
+
+                cd -
+                cp -fv ../master/powershell/PrePostDeploymentScript.Ver2.ps1 $(Build.ArtifactStagingDirectory)/PrePostDeploymentScript.ps1
+              addSpnToEnvironment: true
+              useGlobalConfig: true
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish build artifacts"
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: '${{ parameters.artifactName }}'
+              publishLocation: 'Container'
+          - task: AzurePowerShell@5
+            continueOnError: true 
+            displayName: Stop ADF Triggers
+            inputs:
+              ScriptType: 'FilePath'
+              azureSubscription: 'ID-devops-terraform-bi-${{ parameters.target_env }}'
+              scriptPath: $(Build.ArtifactStagingDirectory)/PrePostDeploymentScript.ps1
+              ScriptArguments: '-armTemplate "$(Build.ArtifactStagingDirectory)/ARMTemplateForFactory.json" -ResourceGroupName "$(target_resource_group)" -DataFactoryName "$(target_adf_name)" -predeployment $true -deleteDeployment $false'
+              errorActionPreference: 'continue'
+              FailOnStandardError: False
+              azurePowerShellVersion: 'LatestVersion'
+              pwsh: true
+          - task: AzureResourceGroupDeployment@2
+            displayName: "Resources deployment"
+            inputs:
+              azureSubscription: 'ID-devops-terraform-bi-${{ parameters.target_env }}'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: 'RG-bi-${{ parameters.target_env }}-adf'
+              location: 'Canada Central'
+              templateLocation: 'Linked artifact'
+              csmFile: '$(Build.ArtifactStagingDirectory)/ARMTemplateForFactory.json'
+              csmParametersFile: '$(Build.ArtifactStagingDirectory)/ARMTemplateParametersForFactory.json'
+              deploymentMode: 'Incremental'
+          - task: AzurePowerShell@5
+            displayName: Start ADF Triggers
+            inputs:
+              scriptType: 'FilePath'
+              ConnectedServiceNameARM: 'ID-devops-terraform-bi-${{ parameters.target_env }}'
+              scriptPath: $(Build.ArtifactStagingDirectory)/PrePostDeploymentScript.ps1
+              ScriptArguments: -armTemplate "$(Build.ArtifactStagingDirectory)/ARMTemplateForFactory.json" -ResourceGroupName "$(target_resource_group)" -DataFactoryName "$(target_adf_name)" -predeployment $false -deleteDeployment $true
+              errorActionPreference: stop
+              FailOnStandardError: False
+              azurePowerShellVersion: 'LatestVersion'
+              pwsh: True 
+
+          - task: AzureCLI@2
+            displayName: "Configure Brightcove trigger by environment"
+            inputs:
+              azureSubscription: 'ID-devops-terraform-bi-${{ parameters.target_env }}'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                export TARGET_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
+                
+                az datafactory trigger stop --factory-name "${TARGET_ADF_NAME}" --resource-group "${TARGET_RESOURCE_GROUP}" --subscription "${TARGET_SUBSCRIPTION_ID}" --name "tr_brightcove_orchestrator"
+                az datafactory trigger stop --factory-name "${TARGET_ADF_NAME}" --resource-group "${TARGET_RESOURCE_GROUP}" --subscription "${TARGET_SUBSCRIPTION_ID}" --name "tr_cindy_orchestrator"
+                
+                if [ ${{ parameters.target_env }} = 'accp' ]
+                then
+                  az datafactory trigger update --factory-name "${TARGET_ADF_NAME}" --resource-group "${TARGET_RESOURCE_GROUP}" --subscription "${TARGET_SUBSCRIPTION_ID}" --name "tr_brightcove_orchestrator" --set "properties.recurrence.schedule.hours=[6]" --set "properties.recurrence.schedule.minutes=[30]"
+                  az datafactory trigger update --factory-name "${TARGET_ADF_NAME}" --resource-group "${TARGET_RESOURCE_GROUP}" --subscription "${TARGET_SUBSCRIPTION_ID}" --name "tr_cindy_orchestrator" --set "properties.recurrence.schedule.hours=[6]" --set "properties.recurrence.schedule.minutes=[30]"
+                fi
+                
+                if [ ${{ parameters.target_env }} = 'prod' ]
+                then
+                  az datafactory trigger update --factory-name "${TARGET_ADF_NAME}" --resource-group "${TARGET_RESOURCE_GROUP}" --subscription "${TARGET_SUBSCRIPTION_ID}" --name "tr_brightcove_orchestrator" --set "properties.recurrence.schedule.hours=[6]" --set "properties.recurrence.schedule.minutes=[00]"
+                  az datafactory trigger update --factory-name "${TARGET_ADF_NAME}" --resource-group "${TARGET_RESOURCE_GROUP}" --subscription "${TARGET_SUBSCRIPTION_ID}" --name "tr_cindy_orchestrator" --set "properties.recurrence.schedule.hours=[6]" --set "properties.recurrence.schedule.minutes=[00]"
+                fi
+                
+                az datafactory trigger start --factory-name "${TARGET_ADF_NAME}" --resource-group "${TARGET_RESOURCE_GROUP}" --subscription "${TARGET_SUBSCRIPTION_ID}" --name "tr_brightcove_orchestrator"
+                az datafactory trigger start --factory-name "${TARGET_ADF_NAME}" --resource-group "${TARGET_RESOURCE_GROUP}" --subscription "${TARGET_SUBSCRIPTION_ID}" --name "tr_cindy_orchestrator"
+          - task: AzureCLI@2
+            displayName: "Merge collaboration branch to master branch"
+            inputs:
+              azureSubscription: 'ID-devops-terraform-bi-${{ parameters.target_env }}'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              
+              inlineScript: |
+                if [ ${{ parameters.target_env }} = 'prod' ]
+                then
+                  echo $(System.AccessToken) | az devops login
+                  az repos pr create --organization "https://dev.azure.com/tele-quebec/" --project tq.bi --repository tq.bi.adf --title "DevOps - Merge collaboration to master" --source-branch collaboration --target-branch master --auto-complete
+                fi
+
+
