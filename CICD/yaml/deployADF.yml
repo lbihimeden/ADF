@@ -1,0 +1,155 @@
+parameters:
+  - name: env
+    displayName: Environment
+    type: string
+    values:
+    - dev
+    - accp
+    - prod
+  - name: DataFactoryName
+    displayName: Data Factory Name
+    type: string
+  - name: DataFactoryResourceGroupName
+    displayName: Data Factory Resource Group Name
+    type: string
+  - name: DataFactorySubscriptionId
+    displayName: Data Factory Subscription Id
+    type: string
+  
+jobs:
+  - deployment: deploymentjob${{ parameters.env }}
+    displayName: Deployment Job ${{ parameters.env }} 
+    environment: ADF deploy ${{ parameters.env }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+            displayName: '1 Get Source Code'
+            clean: true 
+ 
+          # ###################################
+          # # Show environment and treeview
+          # ###################################
+          # - powershell: |
+          #     Write-Output "This is the ${{ parameters.env }} environment"
+          #     tree "$(Pipeline.Workspace)" /F
+          #   displayName: '2 Show environment and Log workspace'
+             
+          # ###################################
+          # # Stop triggers
+          # ###################################
+          # - task: AzurePowerShell@5
+          #   displayName: '3 Stop triggers'
+          #   inputs:
+          #     azureSubscription: 'ID-devops-terraform-bi-${{ parameters.env }}'
+          #     pwsh: true
+          #     azurePowerShellVersion: LatestVersion
+          #     scriptType: filePath
+          #     scriptPath: '$(Pipeline.Workspace)\ArmTemplatesArtifact\PrePostDeploymentScript.ps1'
+          #     scriptArguments: >
+          #       -armTemplate '$(Pipeline.Workspace)\ArmTemplatesArtifact\ARMTemplateForFactory.json'
+          #       -ResourceGroupName $(DataFactoryResourceGroupName)
+          #       -DataFactoryName $(DataFactoryName)
+          #       -predeployment $true
+          #       -deleteDeployment $false
+                 
+          # ###################################
+          # # Deploy ADF Artifact
+          # ###################################
+          # - task: AzureResourceManagerTemplateDeployment@3
+          #   displayName: '4 Deploy ADF Artifact'
+          #   inputs:
+          #     deploymentScope: 'Resource Group'
+          #     azureResourceManagerConnection: 'ID-devops-terraform-bi-${{ parameters.env }}'
+          #     subscriptionId: $(DataFactorySubscriptionId)
+          #     action: 'Create Or Update Resource Group'
+          #     resourceGroupName: $(DataFactoryResourceGroupName)
+          #     location: 'Canada Central'
+          #     templateLocation: 'Linked artifact'
+          #     csmFile: '$(Pipeline.Workspace)/ArmTemplatesArtifact/ARMTemplateForFactory.json'
+          #     csmParametersFile: '$(Pipeline.Workspace)/ArmTemplatesArtifact/ARMTemplateParametersForFactory.json'
+          #     overrideParameters: >
+          #       -factoryName $(DataFactoryName)
+          #       -default_properties_global_param_adf_name_value $(DataFactoryName)
+          #       -default_properties_global_param_env_value $(DataFactoryEnv)
+          #       -default_properties_global_param_subscription_id_value $(DataFactorySubscriptionId)
+          #       -default_properties_global_param_resource_group_name_value $(DataFactoryResourceGroupName)
+          #       -ls_key_vault_bi_baseUrl $(keyVaultUrl)
+          #       -Managed-Identity_resourceId $(ManagedIdentityResourceId)
+          #       -MPE-bi-air-dfs_resourceId $(MPEAirDfsResourceId)
+          #       -MPE-bi-air-dfs_fqdns $(MPEAirDfsFqdns)
+          #       -ls_msql_fab_culturelle_connectionString "$(fabCulturelleConnectionString)"
+          #       -ls_msql_mnmedias_connectionString "$(mnmediasConnectionString)"
+          #       -ls_msql_tq_middleware_connectionString "$(tqMiddlewareConnectionString)"
+          #       -ls_mssql_infocentrecindy_connectionString "$(infocentreCindyConnectionString)"
+          #       -ls_msql_fab_culturelle_secretName $(DMZSecretName)
+          #       -ls_msql_mnmedias_secretName $(DMZSecretName)
+          #       -ls_msql_tq_middleware_secretName $(CORPOSecretName)
+          #       -ls_mssql_infocentrecindy_secretName $(CORPOSecretName)
+          #       -ls_ablb_bulk_xls_serviceEndpoint $(ablbServiceEndpoint)
+          #       -ls_adls_numeris_url $(adlsNumerisUrl)
+          #       -ls_asqlmi_brightcove_server $(asqlmiDatabaseServer)
+          #       -ls_asqlmi_cindy_server $(asqlmiDatabaseServer)
+          #       -ls_asqlmi_generic_server $(asqlmiDatabaseServer)
+          #       -ls_asqlmi_metalog_server $(asqlmiDatabaseServer)
+          #       -tr_brightcove_orchestrator_hours $(brightcoveOrchestratorHours)
+          #       -tr_brightcove_orchestrator_minutes $(brightcoveOrchestratorMinutes)
+          #       -tr_brightcove_orchestrator_endTime $(brightcoveOrchestratorEndTime)
+          #       -tr_cindy_orchestrator_hours $(cindyOrchestratorHours)
+          #       -tr_cindy_orchestrator_minutes $(cindyOrchestratorMinutes)
+          #       -tr_cindy_orchestrator_endTime $(cindyOrchestratorEndTime)
+          #       -tr_brightcove_performance_tuning_hours $(brightcovePerformanceTuningHours)
+          #       -tr_brightcove_performance_tuning_minutes $(brightcovePerformanceTuningMinutes)
+          #       -tr_brightcove_performance_tuning_endTime $(brightcovePerformanceTuningEndTime)
+          #       -tr_cindy_performance_tuning_hours $(cindyPerformanceTuningHours)
+          #       -tr_cindy_performance_tuning_minutes $(cindyPerformanceTuningMinutes)
+          #       -tr_cindy_performance_tuning_endTime $(cindyPerformanceTuningEndTime)
+                
+
+          #     deploymentMode: 'Incremental'
+ 
+          #   env: 
+          #       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+                 
+          # ###################################
+          # # Start triggers and cleanup
+          # ###################################
+          # - task: AzurePowerShell@5
+          #   displayName: '5 Start triggers and cleanup'
+          #   inputs:
+          #     azureSubscription: 'ID-devops-terraform-bi-${{ parameters.env }}'
+          #     pwsh: true
+          #     azurePowerShellVersion: LatestVersion
+          #     scriptType: filePath
+          #     scriptPath: '$(Pipeline.Workspace)\ArmTemplatesArtifact\PrePostDeploymentScript.ps1'
+          #     scriptArguments: >
+          #       -armTemplate $(Pipeline.Workspace)/ArmTemplatesArtifact/ARMTemplateForFactory.json
+          #       -ResourceGroupName $(DataFactoryResourceGroupName)
+          #       -DataFactoryName $(DataFactoryName)
+          #       -predeployment $false
+          #       -deleteDeployment $true
+
+          #################################################
+          # Crate pull request - collaboration to master
+          #################################################
+          - task: AzureCLI@2
+            displayName: '6 Create pull request - collaboration to master'
+            env:
+              AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+            inputs:
+              azureSubscription: 'ID-devops-terraform-bi-${{ parameters.env }}'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                if [ ${{ parameters.env }} = 'accp' ]
+                then
+                  az repos pr create \
+                    --organization "https://dev.azure.com/tele-quebec/" \
+                    --project "tq.bi" \
+                    --repository "tq.bi.poc" \
+                    --title "DevOps - Merge collaboration to master" \
+                    --source-branch "collaboration" \
+                    --target-branch "master" \
+                    --auto-complete true
+                fi

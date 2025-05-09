@@ -1,0 +1,133 @@
+###############################################################################################
+# Azure Data Factory CI/CD Pipeline
+# Maintainer: Lahsen Bihimeden                       
+# Project: ADF Automation for BI Team
+# Description: This pipeline automates the deployment of Azure Data Factory (ADF) artifacts.       
+###############################################################################################
+variables:
+  - group: ParamsGen
+  - group: ParamsDevPOC
+ 
+########################################################
+# Uncomment and tailor to enable branch-based triggers
+########################################################
+# trigger:
+#   branches:
+#     include: # Collaboration branch
+#     - collaboration 
+#   paths:
+#     exclude:
+#     - CICD/*
+ 
+stages:
+###################################
+# Build ADF ARM Artifacts
+###################################
+- stage: CreateADFArtifact
+  displayName: Create ADF Artifact
+  jobs:
+  - job: CreateArtifactJob
+    workspace:
+      clean: all
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - checkout: self
+      displayName: '1 Get Source Code'
+      clean: true
+ 
+    ###################################
+    # Install Node.js for ADF CLI tools
+    ###################################
+    - task: NodeTool@0
+      displayName: '2 Install Node.js'
+      inputs:
+        versionSpec: '18.x'
+        checkLatest: true    
+ 
+    ###################################
+    # Install ADF npm dependencies
+    ###################################
+    - task: Npm@1
+      displayName: '3 Install npm package'
+      inputs:
+        command: 'install'
+        workingDir: '$(Build.Repository.LocalPath)$(PackageLocation)'  # Working folder that contains package.json
+        verbose: true
+ 
+    ###################################
+    # Validate ADF in repository
+    ###################################
+    - task: Npm@1
+      displayName: '4 Validate ADF'
+      inputs:
+        command: 'custom'
+        workingDir: '$(Build.Repository.LocalPath)$(PackageLocation)'
+        customCommand: 'run build validate $(Build.Repository.LocalPath)/ADF /subscriptions/$(DataFactorySubscriptionId)/resourceGroups/$(DataFactoryResourceGroupName)/providers/Microsoft.DataFactory/factories/$(DataFactoryName)'
+ 
+    ###################################
+    # Generate ARM template from repos
+    ###################################
+    - task: Npm@1
+      displayName: '5 Generate ARM template'
+      inputs:
+        command: 'custom'
+        workingDir: '$(Build.Repository.LocalPath)$(PackageLocation)'
+        customCommand: 'run build export $(Build.Repository.LocalPath)/ADF /subscriptions/$(DataFactorySubscriptionId)/resourceGroups/$(DataFactoryResourceGroupName)/providers/Microsoft.DataFactory/factories/$(DataFactoryName) "$(ArmTemplateFolder)"'
+ 
+    ###################################
+    # Publish ARM template as artifact
+    ###################################
+    - task: PublishPipelineArtifact@1
+      displayName: '6 Publish ARM template as artifact'
+      inputs:
+        targetPath: '$(Build.Repository.LocalPath)$(PackageLocation)$(ArmTemplateFolder)' # The arm template export folder
+        artifact: 'ArmTemplatesArtifact'
+        publishLocation: 'pipeline'
+ 
+    ###################################
+    # Log workspace & ARM template
+    ###################################
+    - powershell: |
+        tree "$(Pipeline.Workspace)" /F
+        Write-host "--------------------ARMTemplateForFactory--------------------"
+        Get-Content -Path $(Build.Repository.LocalPath)$(PackageLocation)$(ArmTemplateFolder)/ARMTemplateForFactory.json
+        Write-host "-------------------------------------------------------------"
+      displayName: '7 Log workspace & ARM template '
+ 
+         
+###################################
+# Deploy Acceptance environment
+###################################
+- stage: DeployAcceptance
+  displayName: ADF - Deploy Acceptance
+  variables:
+  - group: ParamsAccpPOC   # acceptance environment parameters
+  pool:
+    vmImage: 'windows-latest'
+  condition: Succeeded()
+  jobs:
+    - template: deployADF.yml
+      parameters:
+        env: accp
+        DataFactoryName: $(DataFactoryName)
+        DataFactoryResourceGroupName: $(DataFactoryResourceGroupName)
+        DataFactorySubscriptionId: $(DataFactorySubscriptionId)
+         
+###################################
+# Deploy Production environment
+###################################
+# - stage: DeployProduction
+#   displayName: ADF - Deploy Production
+#   variables:
+#   - group: ParamsProdPOC   # production environment parameters
+#   pool:
+#     vmImage: 'windows-latest'
+#   condition: Succeeded()
+#   jobs:
+#     - template: deployADF.yml
+#       parameters:
+#         env: prod
+#         DataFactoryName: $(DataFactoryName)
+#         DataFactoryResourceGroupName: $(DataFactoryResourceGroupName)
+#         DataFactorySubscriptionId: $(DataFactorySubscriptionId)
