@@ -1,0 +1,28 @@
+{
+	"name": "Is_rest_api_numeris",
+	"properties": {
+		"parameters": {
+			"param_base_url": {
+				"type": "string",
+				"defaultValue": "https://tvppm-direct.nlogic.ca/rest/2.0/"
+			}
+		},
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "@{linkedService().param_base_url}",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Basic",
+			"userName": "equillaud@telequebec.tv",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_key_vault_bi",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "numeris-api-key"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

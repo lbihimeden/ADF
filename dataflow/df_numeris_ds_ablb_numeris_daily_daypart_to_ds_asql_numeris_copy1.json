@@ -1,0 +1,96 @@
+{
+	"name": "df_numeris_ds_ablb_numeris_daily_daypart_to_ds_asql_numeris_copy1",
+	"properties": {
+		"folder": {
+			"name": "00 - Projects/02 - Numeris/daypart"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_adls_numeris",
+						"type": "LinkedServiceReference"
+					},
+					"name": "Daypart"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_asql_numeris",
+						"type": "DatasetReference"
+					},
+					"name": "sinkDailyDaypart"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flattenDaypart"
+				},
+				{
+					"name": "changeDataType"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     param_daypart_json as string ('Daypart_daily.json')",
+				"}",
+				"source(output(",
+				"          ExpiryTime as string,",
+				"          Responses as (Alerts as string[], AudienceInformation as (Label as string, MetricsPerMarket as (Sample as long, Universe as double)[], OverlapsPrevious as boolean, OverlapsPrimary as boolean, SubsetOfPrevious as boolean, SubsetOfPrimary as boolean)[], DateRanges as (EndDate as string, NonCurrencySurvey as boolean, StartDate as string)[], ErrorCode as string, LastConfirmedDate as string, Markets as (Id as long, IsUserSelectable as boolean, Name as string)[], Messages as string[], Platforms as string, Results as (DaypartLabel as string, StationCode as long, StationCodes as long[], StationName as string, StationNames as string[], StatsPerAudience as (PerActivityType as string[], PerMarket as (AMA as double, LivePercent as double, Rating as double, SecondsTunedTotal as double, SecondsTunedTotalPerCapita as double)[], PerPlatform as string)[], Weekdays as string)[], Status as string)[]",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     purgeFiles: true,",
+				"     format: 'json',",
+				"     fileSystem: 'bi-revolution',",
+				"     folderPath: 'staging/numeris/adf_json',",
+				"     fileName: ($param_daypart_json),",
+				"     documentForm: 'documentPerLine') ~> Daypart",
+				"Daypart foldDown(unrollMultiple(Responses.AudienceInformation,Responses.Results,Responses.Markets,Responses.DateRanges,Responses.Results.StatsPerAudience.PerMarket),",
+				"     mapColumn(",
+				"          StartDate = Responses.DateRanges.StartDate,",
+				"          EndDate = Responses.DateRanges.EndDate,",
+				"          MarketId = Responses.Markets.Id,",
+				"          MarketName = Responses.Markets.Name,",
+				"          Label = Responses.AudienceInformation.Label,",
+				"          StationName = Responses.Results.StationName,",
+				"          StationCode = Responses.Results.StationCode,",
+				"          Weekdays = Responses.Results.Weekdays,",
+				"          DaypartLabel = Responses.Results.DaypartLabel,",
+				"          AMA = Responses.Results.StatsPerAudience.PerMarket.AMA,",
+				"          Rating = Responses.Results.StatsPerAudience.PerMarket.Rating,",
+				"          SecondsTunedTotal = Responses.Results.StatsPerAudience.PerMarket.SecondsTunedTotal,",
+				"          SecondsTunedTotalPerCapita = Responses.Results.StatsPerAudience.PerMarket.SecondsTunedTotalPerCapita,",
+				"          LivePercent = Responses.Results.StatsPerAudience.PerMarket.LivePercent",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flattenDaypart",
+				"flattenDaypart cast(output(",
+				"          MarketId as string,",
+				"          StationCode as string,",
+				"          AMA as string,",
+				"          Rating as string,",
+				"          SecondsTunedTotal as string,",
+				"          SecondsTunedTotalPerCapita as string,",
+				"          LivePercent as string",
+				"     ),",
+				"     errors: true) ~> changeDataType",
+				"changeDataType sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkDailyDaypart"
+			]
+		}
+	}
+}

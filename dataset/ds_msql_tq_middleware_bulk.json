@@ -1,0 +1,16 @@
+{
+	"name": "ds_msql_tq_middleware_bulk",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_msql_tq_middleware",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/tq_middleware"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,15 @@
+{
+	"name": "ds_asqlmi_cindy_star_model",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_asqlmi_cindy",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "00 - Projetcts/03 - Cindy/datawarehouse"
+		},
+		"annotations": [],
+		"type": "AzureSqlMITable",
+		"schema": []
+	}
+}

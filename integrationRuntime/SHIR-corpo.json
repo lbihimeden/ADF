@@ -1,0 +1,16 @@
+{
+	"name": "SHIR-corpo",
+	"properties": {
+		"type": "SelfHosted",
+		"typeProperties": {
+			"linkedInfo": {
+				"resourceId": "/subscriptions/b99ba149-f7ec-43de-9976-aa20b437ee37/resourcegroups/RG-adf-integrated-runtimes/providers/Microsoft.DataFactory/factories/ADF-shared-integrated-runtime/integrationruntimes/SHIR-corpo",
+				"authorizationType": "Rbac",
+				"credential": {
+					"referenceName": "Managed-Identity",
+					"type": "CredentialReference"
+				}
+			}
+		}
+	}
+}

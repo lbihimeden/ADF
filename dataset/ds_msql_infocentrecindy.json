@@ -1,0 +1,110 @@
+{
+	"name": "ds_msql_infocentrecindy",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_mssql_infocentrecindy",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"table_schema": {
+				"type": "string"
+			},
+			"table_name": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/03 - Cindy/infocentrecindy"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "CLE",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 0
+			},
+			{
+				"name": "CLE_AGENCE",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 0
+			},
+			{
+				"name": "CLE_ANNONCEUR",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 0
+			},
+			{
+				"name": "FACTURATION",
+				"type": "decimal",
+				"precision": 1,
+				"scale": 0
+			},
+			{
+				"name": "PAYEUR",
+				"type": "decimal",
+				"precision": 1,
+				"scale": 0
+			},
+			{
+				"name": "RESIDENCE",
+				"type": "decimal",
+				"precision": 1,
+				"scale": 0
+			},
+			{
+				"name": "ADR_NOM",
+				"type": "varchar"
+			},
+			{
+				"name": "ADR_LIGNE_1",
+				"type": "varchar"
+			},
+			{
+				"name": "ADR_LIGNE_2",
+				"type": "varchar"
+			},
+			{
+				"name": "CODE_POSTAL",
+				"type": "varchar"
+			},
+			{
+				"name": "VILLE",
+				"type": "varchar"
+			},
+			{
+				"name": "ETAT",
+				"type": "varchar"
+			},
+			{
+				"name": "PAYS",
+				"type": "varchar"
+			},
+			{
+				"name": "NO_TELEPHONE",
+				"type": "varchar"
+			},
+			{
+				"name": "NO_FAX",
+				"type": "varchar"
+			},
+			{
+				"name": "DATE_FIN_VALIDITE",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().table_schema",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().table_name",
+				"type": "Expression"
+			}
+		}
+	}
+}

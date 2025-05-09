@@ -1,0 +1,34 @@
+{
+	"name": "ds_asql_numeris",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_asql_numeris",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"param_schema_name": {
+				"type": "string"
+			},
+			"param_table_name": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/02 - Numeris/numeris/datawarehouse"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().param_schema_name",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().param_table_name",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

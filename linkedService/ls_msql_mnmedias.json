@@ -1,0 +1,24 @@
+{
+	"name": "ls_msql_mnmedias",
+	"properties": {
+		"description": "BD MnMedias",
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Data Source=sql2014.dmz.telequebec.tv;Initial Catalog=MnMedias;User ID=tq_data_factory_bi_dev",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_key_vault_bi",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "tq-data-factory-bi-dev-dmz-sql-pass"
+			}
+		},
+		"connectVia": {
+			"referenceName": "SHIR-corpo",
+			"type": "IntegrationRuntimeReference"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

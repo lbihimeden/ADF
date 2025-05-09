@@ -1,0 +1,70 @@
+{
+	"name": "ds_ablb_bulk_txt_output",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ablb_bulk_xls",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"param_container": {
+				"type": "string",
+				"defaultValue": "bi-revolution"
+			},
+			"param_directory_name": {
+				"type": "string",
+				"defaultValue": "staging/louise/input"
+			},
+			"param_file_name": {
+				"type": "string",
+				"defaultValue": "LouiseEtatRechercheProduit.csv"
+			},
+			"param_csv_delim": {
+				"type": "string",
+				"defaultValue": "\t"
+			},
+			"param_encodage": {
+				"type": "string",
+				"defaultValue": "UTF-8"
+			},
+			"param_pl_skip_rows": {
+				"type": "int",
+				"defaultValue": 0
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/blob_storage"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().param_file_name",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().param_directory_name",
+					"type": "Expression"
+				},
+				"container": {
+					"value": "@dataset().param_container",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": {
+				"value": "@dataset().param_csv_delim",
+				"type": "Expression"
+			},
+			"encodingName": {
+				"value": "@dataset().param_encodage",
+				"type": "Expression"
+			},
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

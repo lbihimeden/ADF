@@ -1,0 +1,51 @@
+{
+	"name": "ds_ablb_bulk_txt",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ablb_bulk_xls",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"param_container": {
+				"type": "string",
+				"defaultValue": "bi-revolution"
+			},
+			"param_directory_name": {
+				"type": "string",
+				"defaultValue": "staging/louise/input"
+			},
+			"param_file_name": {
+				"type": "string",
+				"defaultValue": "LouiseInfolPublicProduits.txt"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/blob_storage"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().param_file_name",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().param_directory_name",
+					"type": "Expression"
+				},
+				"container": {
+					"value": "@dataset().param_container",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": "\t",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

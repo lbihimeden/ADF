@@ -1,0 +1,35 @@
+{
+	"name": "ADF-tqbi-dev",
+	"properties": {
+		"globalParameters": {
+			"global_param_adf_name": {
+				"type": "String",
+				"value": "ADF-tqbi-dev"
+			},
+			"global_param_env": {
+				"type": "String",
+				"value": "Développement"
+			},
+			"global_param_subscription_id": {
+				"type": "String",
+				"value": "8fddc10e-b0b2-49b8-8e10-9ec40601dd6c"
+			},
+			"global_param_resource_group_name": {
+				"type": "string",
+				"value": "rg-bi-dev-adf"
+			}
+		}
+	},
+	"location": "canadacentral",
+	"identity": {
+		"type": "SystemAssigned,UserAssigned",
+		"principalId": "bea2d35b-a09e-4025-a539-a01c190d67a3",
+		"tenantId": "9c5285e1-4100-448a-a9bb-6fd1b4ce9c9f",
+		"userAssignedIdentities": {
+			"/subscriptions/8fddc10e-b0b2-49b8-8e10-9ec40601dd6c/resourcegroups/RG-bi-dev-adf/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ID-bi-dev-adf": {
+				"clientId": "4f4a4562-d170-4365-b833-d46b31af5bd9",
+				"principalId": "c69746b2-47af-4e7c-aeeb-b90e4fadf1b2"
+			}
+		}
+	}
+}

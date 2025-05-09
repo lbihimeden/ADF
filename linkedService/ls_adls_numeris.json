@@ -1,0 +1,18 @@
+{
+	"name": "ls_adls_numeris",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://satqadfbidev.dfs.core.windows.net/",
+			"credential": {
+				"referenceName": "Managed-Identity",
+				"type": "CredentialReference"
+			}
+		},
+		"connectVia": {
+			"referenceName": "AIR-DataFlow",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

@@ -1,0 +1,44 @@
+{
+	"name": "ds_ablb_bulk_xls_input",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ablb_bulk_xls",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"param_directory_path": {
+				"type": "string",
+				"defaultValue": "staging/brightcove/input"
+			},
+			"param_container": {
+				"type": "string",
+				"defaultValue": "bi-revolution"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/blob_storage"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": {
+					"value": "@dataset().param_directory_path",
+					"type": "Expression"
+				},
+				"container": {
+					"value": "@dataset().param_container",
+					"type": "Expression"
+				}
+			},
+			"sheetIndex": {
+				"value": "@int('0')",
+				"type": "Expression"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

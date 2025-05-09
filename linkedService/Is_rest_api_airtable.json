@@ -1,0 +1,19 @@
+{
+	"name": "Is_rest_api_airtable",
+	"properties": {
+		"parameters": {
+			"param_relative_url": {
+				"type": "string",
+				"defaultValue": "https://api.airtable.com/v0/appVn0IWHE7SD7v29/tbljCFgeNu8AC2PRy"
+			}
+		},
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "@{linkedService().param_relative_url}",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

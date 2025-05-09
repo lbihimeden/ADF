@@ -1,0 +1,10 @@
+{
+	"name": "MPE-bi-air-dfs",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/8fddc10e-b0b2-49b8-8e10-9ec40601dd6c/resourceGroups/RG-bi-dev-data/providers/Microsoft.Storage/storageAccounts/satqadfbidev",
+		"groupId": "blob"
+	},
+        "fqdns": [
+            "satqadfbidev.blob.core.windows.net"
+        ]
+}

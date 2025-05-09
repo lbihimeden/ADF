@@ -1,0 +1,21 @@
+{
+	"name": "ls_ablb_bulk_xls",
+	"properties": {
+		"description": "Location: bi-revolution\nUsed to get xlsx files from bi-revolution container",
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"serviceEndpoint": "https://satqadfbidev.blob.core.windows.net/",
+			"accountKind": "StorageV2",
+			"credential": {
+				"referenceName": "Managed-Identity",
+				"type": "CredentialReference"
+			}
+		},
+		"connectVia": {
+			"referenceName": "AIR-DataFlow",
+			"type": "IntegrationRuntimeReference"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

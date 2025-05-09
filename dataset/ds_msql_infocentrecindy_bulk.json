@@ -1,0 +1,15 @@
+{
+	"name": "ds_msql_infocentrecindy_bulk",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_mssql_infocentrecindy",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "00 - Projetcts/03 - Cindy/infocentrecindy"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	}
+}

@@ -1,0 +1,16 @@
+{
+	"name": "ds_msql_mnmedias_bulk",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_msql_mnmedias",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/mnmedias"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

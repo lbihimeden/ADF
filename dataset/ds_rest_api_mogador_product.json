@@ -1,0 +1,18 @@
+{
+	"name": "ds_rest_api_mogador_product",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_rest_api_mogador_product",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/brightcove"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": "search.json?app_id=ab983d5a&app_key=3f645ad98cef52a73dd965c2ada487f6"
+		},
+		"schema": []
+	}
+}

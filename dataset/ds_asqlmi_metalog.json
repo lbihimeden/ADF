@@ -1,0 +1,34 @@
+{
+	"name": "ds_asqlmi_metalog",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_asqlmi_metalog",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"param_schema_name": {
+				"type": "string"
+			},
+			"param_table_name": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/metalog"
+		},
+		"annotations": [],
+		"type": "AzureSqlMITable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().param_schema_name",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().param_table_name",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

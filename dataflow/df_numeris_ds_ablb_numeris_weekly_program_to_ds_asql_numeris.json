@@ -1,0 +1,92 @@
+{
+	"name": "df_numeris_ds_ablb_numeris_weekly_program_to_ds_asql_numeris",
+	"properties": {
+		"folder": {
+			"name": "00 - Projects/02 - Numeris/program"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_adls_numeris",
+						"type": "LinkedServiceReference"
+					},
+					"name": "Program"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_asql_numeris",
+						"type": "DatasetReference"
+					},
+					"name": "sinkWeeklyProgram"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flattenProgram"
+				},
+				{
+					"name": "changeDataType"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     param_program_json as string (toString('Program_weekly.json'))",
+				"}",
+				"source(output(",
+				"          ExpiryTime as string,",
+				"          Responses as (Alerts as string[], AudienceInformation as (Label as string, MetricsPerMarket as (Sample as long, Universe as double)[], OverlapsPrevious as boolean, OverlapsPrimary as boolean, SubsetOfPrevious as boolean, SubsetOfPrimary as boolean)[], DateRanges as (EndDate as string, NonCurrencySurvey as boolean, StartDate as string)[], ErrorCode as string, LastConfirmedDate as string, Markets as (Id as long, IsUserSelectable as boolean, Name as string)[], Messages as string[], Platforms as string, Results as (Duration as long, EndTime as string, EpisodeTitle as string, FirstAirDate as string, LastAirDate as string, NumAired as long, ProgramCode as long, ProgramMetadata as (CmfCountryOfOrigin as string, CmfCountryOfOriginCode as long, CmfGenreCode as long, IsCbcAvailable as boolean, IsMovie as boolean, IsMultiDay as boolean, IsPremier as boolean, IsRepeat as boolean, IsSeasonToDate as boolean, IsSpecial as boolean), ProgramName as string, StartTime as string, StationCode as long, StationName as string, StatsPerAudience as (PerActivityType as string[], PerMarket as (SecondsTunedPerWeek as double, WeeklyReach as double, WeeklyReachPercent as double)[], PerPlatform as string)[], Weekdays as string)[], Status as string)[]",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'json',",
+				"     fileSystem: 'bi-revolution',",
+				"     folderPath: 'staging/numeris/adf_json',",
+				"     fileName: ($param_program_json),",
+				"     documentForm: 'documentPerLine') ~> Program",
+				"Program foldDown(unrollMultiple(Responses.AudienceInformation,Responses.Results,Responses.Markets,Responses.DateRanges,Responses.Results.StatsPerAudience.PerMarket),",
+				"     mapColumn(",
+				"          StartDate = Responses.DateRanges.StartDate,",
+				"          EndDate = Responses.DateRanges.EndDate,",
+				"          MarketId = Responses.Markets.Id,",
+				"          MarketName = Responses.Markets.Name,",
+				"          Label = Responses.AudienceInformation.Label,",
+				"          StationCode = Responses.Results.StationCode,",
+				"          StationName = Responses.Results.StationName,",
+				"          ProgramCode = Responses.Results.ProgramCode,",
+				"          ProgramName = Responses.Results.ProgramName,",
+				"          Weekdays = Responses.Results.Weekdays,",
+				"          WeeklyReach = Responses.Results.StatsPerAudience.PerMarket.WeeklyReach,",
+				"          WeeklyReachPercent = Responses.Results.StatsPerAudience.PerMarket.WeeklyReachPercent,",
+				"          SecondsTunedPerWeek = Responses.Results.StatsPerAudience.PerMarket.SecondsTunedPerWeek",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flattenProgram",
+				"flattenProgram cast(output(",
+				"          MarketId as string,",
+				"          StationCode as string,",
+				"          ProgramCode as string,",
+				"          WeeklyReach as string,",
+				"          WeeklyReachPercent as string,",
+				"          SecondsTunedPerWeek as string",
+				"     ),",
+				"     errors: true) ~> changeDataType",
+				"changeDataType sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkWeeklyProgram"
+			]
+		}
+	}
+}

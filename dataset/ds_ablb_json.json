@@ -1,0 +1,45 @@
+{
+	"name": "ds_ablb_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ablb_bulk_xls",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"param_container": {
+				"type": "string",
+				"defaultValue": "bi-revolution"
+			},
+			"param_directory_name": {
+				"type": "string",
+				"defaultValue": "staging/numeris/adf_json"
+			},
+			"param_file_name": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/02 - Numeris/numeris/blob_storage"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().param_file_name",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().param_directory_name",
+					"type": "Expression"
+				},
+				"container": {
+					"value": "@dataset().param_container",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	}
+}

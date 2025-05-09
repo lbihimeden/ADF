@@ -1,0 +1,32 @@
+{
+	"name": "ds_rest_api_britghtcove_direct",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_rest_api_britghcove",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"param_from_date": {
+				"type": "string"
+			},
+			"param_to_date": {
+				"type": "string"
+			},
+			"param_direct_list": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/brightcove"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "data?accounts=6150020952001,6101674910001,6144773012001&dimensions=date_hour,account,video,browser_type,device_os,device_manufacturer,device_type&fields=video.reference_id,play_rate,play_request,video_impression,video_percent_viewed,video_seconds_viewed&where=video==@{dataset().param_direct_list}&from=@{dataset().param_from_date}&to=@{dataset().param_to_date}&limit=all",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}

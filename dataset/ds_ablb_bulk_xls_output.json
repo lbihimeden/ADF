@@ -1,0 +1,52 @@
+{
+	"name": "ds_ablb_bulk_xls_output",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ablb_bulk_xls",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"param_directory_path": {
+				"type": "string",
+				"defaultValue": "staging/brightcove/input"
+			},
+			"param_file_name": {
+				"type": "string",
+				"defaultValue": "BrightcoveCalendrier.xlsx"
+			},
+			"param_container": {
+				"type": "string",
+				"defaultValue": "bi-revolution"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/blob_storage"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().param_file_name",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().param_directory_path",
+					"type": "Expression"
+				},
+				"container": {
+					"value": "@dataset().param_container",
+					"type": "Expression"
+				}
+			},
+			"sheetIndex": {
+				"value": "@int('0')",
+				"type": "Expression"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

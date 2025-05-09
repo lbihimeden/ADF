@@ -1,0 +1,24 @@
+{
+	"name": "ls_mssql_infocentrecindy",
+	"properties": {
+		"description": "InfoCentre Cindy",
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Data Source=sql14-c1;Initial Catalog=InfoCentreCindy;User ID=tq_data_factory_bi_dev",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_key_vault_bi",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "tq-data-factory-bi-dev-corpo-sql-pass"
+			}
+		},
+		"connectVia": {
+			"referenceName": "SHIR-corpo",
+			"type": "IntegrationRuntimeReference"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

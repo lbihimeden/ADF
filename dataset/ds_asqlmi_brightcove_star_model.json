@@ -1,0 +1,16 @@
+{
+	"name": "ds_asqlmi_brightcove_star_model",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_asqlmi_brightcove",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/datawarehouse"
+		},
+		"annotations": [],
+		"type": "AzureSqlMITable",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

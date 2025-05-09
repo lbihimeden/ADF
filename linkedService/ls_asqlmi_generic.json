@@ -1,0 +1,28 @@
+{
+	"name": "ls_asqlmi_generic",
+	"properties": {
+		"parameters": {
+			"param_database_name": {
+				"type": "String",
+				"defaultValue": "Brightcove"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlMI",
+		"typeProperties": {
+			"server": "sqlmi-bi-dev-mssql.76e3ddcb6d77.database.windows.net",
+			"database": "@{linkedService().param_database_name}",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "UserAssignedManagedIdentity",
+			"credential": {
+				"referenceName": "Managed-Identity",
+				"type": "CredentialReference"
+			}
+		},
+		"connectVia": {
+			"referenceName": "SHIR-corpo",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

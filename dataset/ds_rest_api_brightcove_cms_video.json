@@ -1,0 +1,41 @@
+{
+	"name": "ds_rest_api_brightcove_cms_video",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_rest_api_britghcove_cms",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"param_account_id": {
+				"type": "string",
+				"defaultValue": "6101674910001"
+			},
+			"param_limit": {
+				"type": "int",
+				"defaultValue": 25
+			},
+			"param_offset": {
+				"type": "int",
+				"defaultValue": 1
+			},
+			"param_from_date": {
+				"type": "string"
+			},
+			"param_to_date": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/brightcove"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@concat('accounts/',pipeline().parameters.param_account_id,'/videos?sort=created_at&limit=',string(pipeline().parameters.param_limit),'&offset=',string(dataset().param_offset),'&query=+created_at:[',dataset().param_from_date,' TO ',dataset().param_to_date,'] OR +updated_at:[',dataset().param_from_date,' TO ',dataset().param_to_date,']')",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}

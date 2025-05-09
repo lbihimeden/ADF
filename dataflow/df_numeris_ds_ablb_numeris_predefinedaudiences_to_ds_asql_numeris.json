@@ -1,0 +1,79 @@
+{
+	"name": "df_numeris_ds_ablb_numeris_predefinedaudiences_to_ds_asql_numeris",
+	"properties": {
+		"folder": {
+			"name": "00 - Projects/02 - Numeris/reference"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_adls_numeris",
+						"type": "LinkedServiceReference"
+					},
+					"name": "PredefinedAudiences"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_asql_numeris",
+						"type": "DatasetReference"
+					},
+					"name": "sinkPredefinedAudiences"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flattenPredefinedAudiences"
+				},
+				{
+					"name": "changeDataTypes"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          AttributeValues as (Id as short, Values as short[])[],",
+				"          Id as short,",
+				"          Label as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'json',",
+				"     fileSystem: 'bi-revolution',",
+				"     folderPath: 'staging/numeris/adf_json',",
+				"     fileName: 'PredefinedAudiences.json',",
+				"     documentForm: 'documentPerLine') ~> PredefinedAudiences",
+				"PredefinedAudiences foldDown(unroll(AttributeValues.Values, AttributeValues.Values),",
+				"     mapColumn(",
+				"          Id,",
+				"          Label,",
+				"          AttributeValuesId = AttributeValues.Id,",
+				"          AttributeValues = AttributeValues.Values",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flattenPredefinedAudiences",
+				"flattenPredefinedAudiences cast(output(",
+				"          Id as integer,",
+				"          AttributeValuesId as integer,",
+				"          AttributeValues as integer",
+				"     ),",
+				"     errors: true) ~> changeDataTypes",
+				"changeDataTypes sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     truncate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkPredefinedAudiences"
+			]
+		}
+	}
+}

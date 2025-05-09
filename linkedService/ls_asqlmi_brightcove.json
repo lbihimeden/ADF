@@ -1,0 +1,22 @@
+{
+	"name": "ls_asqlmi_brightcove",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlMI",
+		"typeProperties": {
+			"server": "sqlmi-bi-dev-mssql.76e3ddcb6d77.database.windows.net",
+			"database": "Brightcove",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "UserAssignedManagedIdentity",
+			"credential": {
+				"referenceName": "Managed-Identity",
+				"type": "CredentialReference"
+			}
+		},
+		"connectVia": {
+			"referenceName": "SHIR-corpo",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

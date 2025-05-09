@@ -1,0 +1,37 @@
+{
+	"name": "ds_rest_api_numeris_generic",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Is_rest_api_numeris",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"param_base_url": {
+					"value": "@dataset().param_base_url",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"param_relative_url": {
+				"type": "string",
+				"defaultValue": "reference/Demographics"
+			},
+			"param_base_url": {
+				"type": "string",
+				"defaultValue": "https://tvppm-direct.nlogic.ca/rest/2.0/"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/02 - Numeris/numeris/numeris"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@dataset().param_relative_url",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}

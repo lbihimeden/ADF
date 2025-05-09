@@ -1,0 +1,27 @@
+{
+	"name": "ds_rest_api_brightcove_airtable_lafabott",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Is_rest_api_airtable",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"param_relative_url": {
+					"value": "@dataset().param_relative_url",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"param_relative_url": {
+				"type": "string",
+				"defaultValue": "v0/appVn0IWHE7SD7v29/tbljCFgeNu8AC2PRy"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/brightcove"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}

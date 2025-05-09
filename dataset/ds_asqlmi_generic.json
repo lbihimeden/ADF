@@ -1,0 +1,42 @@
+{
+	"name": "ds_asqlmi_generic",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_asqlmi_generic",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"param_database_name": {
+					"value": "@dataset().database_name",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"schema_name": {
+				"type": "string"
+			},
+			"table_name": {
+				"type": "string"
+			},
+			"database_name": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/blob_storage"
+		},
+		"annotations": [],
+		"type": "AzureSqlMITable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().schema_name",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().table_name",
+				"type": "Expression"
+			}
+		}
+	}
+}

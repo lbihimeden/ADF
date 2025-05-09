@@ -1,0 +1,26 @@
+{
+	"name": "ds_rest_api_britghtcove_direct_videolist",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_rest_api_britghcove_cms",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"param_account_id": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/brightcove"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "accounts/6101674910001/videos?limit=100&offset=0&sort=-updated_at&query=(delivery_type:live_origin)",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}

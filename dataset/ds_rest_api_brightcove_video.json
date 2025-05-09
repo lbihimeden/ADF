@@ -1,0 +1,27 @@
+{
+	"name": "ds_rest_api_brightcove_video",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_rest_api_britghcove",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"param_next_run": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "00 - Projetcts/01 - Brightcove/brightcove"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "data?accounts=6150020952001,6144773012001,6101674910001&dimensions=account,video&fields=video_duration,video_name,video.reference_id,video.name,video.description,video.complete,video.created_at,video.duration,video.economics,video.long_description,video.state,video.tags,video.updated_at&from=alltime&where=video.q==created_at:@{dataset().param_next_run}%20updated_at:@{dataset().param_next_run}&limit=all",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
